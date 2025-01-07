@@ -20,7 +20,6 @@ export const connectDB = async () => {
 	cached.promise =
 		cached.promise ||
 		mongoose.connect(MONGODB_URL, {
-			dbName: "clerk-auth",
 			bufferCommands: true,
 			connectTimeoutMS: 30000,
 		});
