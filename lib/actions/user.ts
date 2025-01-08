@@ -3,7 +3,7 @@
 import User from "../models/user";
 import { connectDB } from "../mongodb";
 
-export const createOrUpdateUser = async (user: any) => {
+export const createUser = async (user: any) => {
 	try {
 		await connectDB();
 		const newUser = await User.findOneAndUpdate(
@@ -20,7 +20,7 @@ export const createOrUpdateUser = async (user: any) => {
 			{ upsert: true, new: true },
 		);
 
-		return newUser;
+		return JSON.parse(JSON.stringify(newUser));
 	} catch (error) {
 		console.log(error);
 	}

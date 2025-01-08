@@ -1,7 +1,7 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { clerkClient, WebhookEvent } from "@clerk/nextjs/server";
-import { createOrUpdateUser, deleteUser } from "@/lib/actions/user";
+import { createOrUpdateUser, createUser, deleteUser } from "@/lib/actions/user";
 import User from "@/lib/models/user";
 
 export async function POST(req: Request) {
@@ -56,7 +56,7 @@ export async function POST(req: Request) {
 
 	// Add user to your database or any other storage if eventType is user.created
 
-	if (eventType === "user.created" || eventType === "user.updated") {
+	if (eventType === "user.created") {
 		const { id, email_addresses, image_url, first_name, last_name, username } =
 			evt.data;
 		const user = {
@@ -68,8 +68,8 @@ export async function POST(req: Request) {
 			lastName: last_name,
 		};
 
+		console.log(user);
 		const newUser = await createOrUpdateUser(user);
-		console.log(newUser);
 
 		if (newUser) {
 			const clerk = await clerkClient();
@@ -89,6 +89,9 @@ export async function POST(req: Request) {
 		const { id } = evt.data;
 		await deleteUser(id);
 	}
+
+	console.log(`Received webhook with ID ${id} and event type of ${eventType}`);
+	console.log("Webhook payload:", body);
 
 	return new Response("Webhook received", { status: 200 });
 }
