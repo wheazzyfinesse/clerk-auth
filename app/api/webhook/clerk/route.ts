@@ -1,7 +1,8 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { clerkClient, WebhookEvent } from "@clerk/nextjs/server";
-import { createUser } from "@/lib/actions/user";
+import { createOrUpdateUser, deleteUser } from "@/lib/actions/user";
+import User from "@/lib/models/user";
 
 export async function POST(req: Request) {
 	const WEBHOOK_SIGNING_SECRET = process.env.WEBHOOK_SIGNING_SECRET;
@@ -53,21 +54,22 @@ export async function POST(req: Request) {
 	const { id } = evt.data;
 	const eventType = evt.type;
 
-	if (eventType === "user.created") {
+	// Add user to your database or any other storage if eventType is user.created
+
+	if (eventType === "user.created" || eventType === "user.updated") {
 		const { id, email_addresses, image_url, first_name, last_name, username } =
 			evt.data;
 		const user = {
 			clerkId: id,
-			email: email_addresses[0].email_address,
+			email: email_addresses,
 			username: username,
 			avatarUrl: image_url,
 			firstName: first_name,
 			lastName: last_name,
 		};
 
-		// Add user to your database or any other storage system here
-		console.log(user);
-		const newUser = await createUser(user);
+		const newUser = await createOrUpdateUser(user);
+		console.log(newUser);
 
 		if (newUser) {
 			const clerk = await clerkClient();
@@ -82,8 +84,11 @@ export async function POST(req: Request) {
 		}
 	}
 
-	console.log(`Received webhook with ID ${id} and event type of ${eventType}`);
-	console.log("Webhook payload:", body);
+	// Delete user from your database or any other storage if eventType is user.deleted
+	if (eventType === "user.deleted") {
+		const { id } = evt.data;
+		await deleteUser(id);
+	}
 
 	return new Response("Webhook received", { status: 200 });
 }

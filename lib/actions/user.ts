@@ -1,14 +1,32 @@
 "use server";
 
 import User from "../models/user";
-import { connectDB, connectMongoDB } from "../mongodb";
+import { connectDB } from "../mongodb";
 
-export const createUser = async (user: any) => {
+export const createOrUpdateUser = async (user: any) => {
 	try {
 		await connectDB();
-		// await connectMongoDB();
-		const newUser = await User.create(user);
-		return JSON.parse(JSON.stringify(newUser));
+		const newUser = await User.findOneAndUpdate(
+			{ clerkId: user.clerkId },
+			{
+				$set: {
+					user,
+				},
+			},
+			{ upsert: true, new: true },
+		);
+
+		return newUser;
+	} catch (error) {
+		console.log(error);
+	}
+};
+
+export const deleteUser = async (id: any) => {
+	try {
+		await connectDB();
+		await User.findOneAndDelete({ clerkId: id });
+		console.log("deleted user");
 	} catch (error) {
 		console.log(error);
 	}
