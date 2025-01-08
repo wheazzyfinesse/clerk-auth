@@ -1,7 +1,7 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { clerkClient, WebhookEvent } from "@clerk/nextjs/server";
-import { createOrUpdateUser, createUser, deleteUser } from "@/lib/actions/user";
+import { createOrUpdateUser, deleteUser } from "@/lib/actions/user";
 import User from "@/lib/models/user";
 
 export async function POST(req: Request) {
