@@ -67,20 +67,12 @@ export async function POST(req: Request) {
 			firstName: first_name,
 			lastName: last_name,
 		};
-
-		console.log(user);
-		const newUser = await createOrUpdateUser(user);
-
-		if (newUser) {
-			const clerk = await clerkClient();
-			await clerk.users.updateUserMetadata(id, {
-				publicMetadata: {
-					userId: newUser.id,
-				},
-			});
-			console.log(`Created user with Clerk ID ${newUser.clerkId}`);
-		} else {
-			console.error(`Failed to create user with Clerk ID ${id}`);
+		try {
+			const newUser = await createOrUpdateUser(user);
+			return new Response("user created or updated", { status: 200 });
+		} catch (error) {
+			console.log("error creating user", error);
+			return new Response("Error occured", { status: 400 });
 		}
 	}
 
@@ -88,10 +80,8 @@ export async function POST(req: Request) {
 	if (eventType === "user.deleted") {
 		const { id } = evt.data;
 		await deleteUser(id);
+		return new Response("user deleted", { status: 200 });
 	}
-
-	console.log(`Received webhook with ID ${id} and event type of ${eventType}`);
-	console.log("Webhook payload:", body);
 
 	return new Response("Webhook received", { status: 200 });
 }
