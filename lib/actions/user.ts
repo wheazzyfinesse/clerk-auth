@@ -19,7 +19,7 @@ export const createOrUpdateUser = async (user: any) => {
 			},
 			{ upsert: true, new: true },
 		);
-
+		console.log("user created or updated");
 		return JSON.parse(JSON.stringify(newUser));
 	} catch (error) {
 		console.log(error);
