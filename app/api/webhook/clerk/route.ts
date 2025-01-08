@@ -56,7 +56,7 @@ export async function POST(req: Request) {
 
 	// Add user to your database or any other storage if eventType is user.created
 
-	if (eventType === "user.created") {
+	if (eventType === "user.created" || eventType === "user.updated") {
 		const { id, email_addresses, image_url, first_name, last_name, username } =
 			evt.data;
 		const user = {
